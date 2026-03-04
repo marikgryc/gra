@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity() {
         val isWin = when (currentLevel) {
             1 -> checkLevel1(grid)
             2 -> checkLevel2(grid)
+            3 -> checkLevel3(grid)
+            4 -> checkLevel4(grid)
             else -> false
         }
 
@@ -79,8 +81,38 @@ class MainActivity : AppCompatActivity() {
         }
         return true
     }
+    private fun checkLevel3(grid: GridLayout): Boolean {
+        for (row in 0 until 5) {
+            var redCount = 0
+            for (col in 0 until 3) {
+                val index = row * 3 + col
+                val color = (grid.getChildAt(index).background as ColorDrawable).color
+                if (color == Color.RED) {
+                    redCount++
+                }
+            }
+            if (redCount != 1) return false
+        }
+        return true
+    }
+    private fun checkLevel4(grid: GridLayout): Boolean {
+        for (i in 0 until grid.childCount) {
+            val color = (grid.getChildAt(i).background as ColorDrawable).color
+            val row = i / 3
+            val col = i % 3
 
+            if (col < 2) {
+                val rightColor = (grid.getChildAt(i + 1).background as ColorDrawable).color
+                if (color == rightColor) return false
+            }
 
+            if (row < 4) {
+                val bottomColor = (grid.getChildAt(i + 3).background as ColorDrawable).color
+                if (color == bottomColor) return false
+            }
+        }
+        return true
+    }
     private fun showLevelCompleteDialog(grid: GridLayout) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Рівень $currentLevel пройдено!")
@@ -89,11 +121,13 @@ class MainActivity : AppCompatActivity() {
 
 
         builder.setPositiveButton("Наступний") { _, _ ->
-            if (currentLevel < 2) {
+            if (currentLevel < 4) {
                 currentLevel++
                 setupGame(grid)
             } else {
-                Toast.makeText(this, "Чекайте на нові рівні!", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Вітаємо! Ви пройшли всі рівні!", Toast.LENGTH_LONG).show()
+                currentLevel = 1
+                setupGame(grid)
             }
         }
 
